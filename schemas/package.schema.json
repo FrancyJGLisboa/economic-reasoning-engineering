@@ -1,0 +1,711 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Economic reasoning portable package 0.3",
+  "description": "Artifact definitions. The bundled validator implements only the JSON Schema keywords used here. It is not a general JSON Schema engine.",
+  "$defs": {
+    "source_ref": {
+      "type": "object",
+      "required": [
+        "source_id",
+        "source_global_id",
+        "locator",
+        "anchor",
+        "filename"
+      ],
+      "properties": {
+        "source_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_global_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "locator": {
+          "type": "string",
+          "minLength": 1
+        },
+        "anchor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "filename": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "line": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "source_id",
+        "global_id",
+        "record_class",
+        "filename",
+        "availability",
+        "coverage"
+      ],
+      "properties": {
+        "source_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "global_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "record_class": {
+          "const": "source_statement"
+        },
+        "filename": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "availability": {
+          "enum": [
+            "available",
+            "unavailable"
+          ]
+        },
+        "coverage": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "episode": {
+      "type": "object",
+      "required": [
+        "id",
+        "global_id",
+        "record_class",
+        "title",
+        "status",
+        "source_refs"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "global_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "record_class": {
+          "enum": [
+            "source_statement",
+            "analyst_inference",
+            "investigator_proposal",
+            "test_result",
+            "mixed"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "ACCEPTED",
+            "REJECTED"
+          ]
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/source_ref"
+          }
+        }
+      }
+    },
+    "opinion": {
+      "type": "object",
+      "required": [
+        "id",
+        "global_id",
+        "record_class",
+        "episode_id",
+        "thesis",
+        "source_refs"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "global_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "record_class": {
+          "enum": [
+            "source_statement",
+            "analyst_inference",
+            "investigator_proposal",
+            "test_result",
+            "mixed"
+          ]
+        },
+        "episode_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "thesis": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/source_ref"
+          }
+        }
+      }
+    },
+    "method": {
+      "type": "object",
+      "required": [
+        "id",
+        "global_id",
+        "record_class",
+        "episode_id",
+        "title",
+        "trigger",
+        "required_inputs",
+        "ordered_steps",
+        "competing_hypotheses",
+        "discrimination_test",
+        "abstention_conditions",
+        "source_refs",
+        "source_vs_inference",
+        "operational_readiness"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "global_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "record_class": {
+          "enum": [
+            "source_statement",
+            "analyst_inference",
+            "investigator_proposal",
+            "test_result",
+            "mixed"
+          ]
+        },
+        "episode_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "trigger": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required_inputs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object"
+          }
+        },
+        "ordered_steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "order",
+              "action",
+              "readiness"
+            ],
+            "properties": {
+              "order": {
+                "type": "integer"
+              },
+              "action": {
+                "type": "string",
+                "minLength": 1
+              },
+              "readiness": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "competing_hypotheses": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "discrimination_test": {
+          "type": "string",
+          "minLength": 1
+        },
+        "abstention_conditions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "source_vs_inference": {
+          "type": "object",
+          "required": [
+            "source",
+            "investigator"
+          ],
+          "properties": {
+            "source": {
+              "type": "string",
+              "minLength": 1
+            },
+            "investigator": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "operational_readiness": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/source_ref"
+          }
+        }
+      }
+    },
+    "node": {
+      "type": "object",
+      "required": [
+        "id",
+        "global_id",
+        "record_class",
+        "type",
+        "text"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "global_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "record_class": {
+          "enum": [
+            "source_statement",
+            "analyst_inference",
+            "investigator_proposal",
+            "test_result",
+            "mixed"
+          ]
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/source_ref"
+          }
+        }
+      }
+    },
+    "edge": {
+      "type": "object",
+      "required": [
+        "id",
+        "global_id",
+        "record_class",
+        "from",
+        "to",
+        "type"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "global_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "record_class": {
+          "enum": [
+            "source_statement",
+            "analyst_inference",
+            "investigator_proposal",
+            "test_result",
+            "mixed"
+          ]
+        },
+        "from": {
+          "type": "string",
+          "minLength": 1
+        },
+        "to": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/source_ref"
+          }
+        }
+      }
+    },
+    "manifest": {
+      "type": "object",
+      "required": [
+        "format_version",
+        "run_id",
+        "skill_version",
+        "title",
+        "entrypoint",
+        "records",
+        "files",
+        "source_coverage",
+        "validation_claims"
+      ],
+      "properties": {
+        "format_version": {
+          "const": "0.3"
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "skill_version": {
+          "const": "0.3"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entrypoint": {
+          "const": "CONTEXT.md"
+        },
+        "records": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "global_id",
+              "collection",
+              "local_id",
+              "path",
+              "pointer"
+            ],
+            "properties": {
+              "global_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "collection": {
+                "type": "string",
+                "minLength": 1
+              },
+              "local_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "pointer": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "path",
+              "bytes",
+              "sha256"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "bytes": {
+                "type": "integer"
+              },
+              "sha256": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "source_coverage": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "validation_claims": {
+          "type": "object"
+        }
+      }
+    }
+  },
+  "artifacts": {
+    "sources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/source"
+      }
+    },
+    "episodes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/episode"
+      }
+    },
+    "opinions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/opinion"
+      }
+    },
+    "reasoning_cards": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/method"
+      }
+    },
+    "data_requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "global_id",
+          "record_class",
+          "episode_id",
+          "reasoning_id",
+          "required_inputs",
+          "source_refs"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "global_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "record_class": {
+            "enum": [
+              "source_statement",
+              "analyst_inference",
+              "investigator_proposal",
+              "test_result",
+              "mixed"
+            ]
+          },
+          "episode_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reasoning_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "required_inputs": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "source_refs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/source_ref"
+            }
+          }
+        }
+      }
+    },
+    "reviews": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "global_id",
+          "record_class",
+          "result"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "global_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "record_class": {
+            "enum": [
+              "source_statement",
+              "analyst_inference",
+              "investigator_proposal",
+              "test_result",
+              "mixed"
+            ]
+          },
+          "result": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_refs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/source_ref"
+            }
+          }
+        }
+      }
+    },
+    "graph": {
+      "type": "object",
+      "required": [
+        "nodes",
+        "edges"
+      ],
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/node"
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/edge"
+          }
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "COMPLETE",
+            "PARTIAL",
+            "BLOCKED",
+            "STOPPED"
+          ]
+        }
+      }
+    },
+    "transfer_probe": {
+      "type": "object",
+      "required": [
+        "id",
+        "global_id",
+        "record_class",
+        "status",
+        "method_id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "global_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "record_class": {
+          "enum": [
+            "source_statement",
+            "analyst_inference",
+            "investigator_proposal",
+            "test_result",
+            "mixed"
+          ]
+        },
+        "status": {
+          "enum": [
+            "NOT_TESTED",
+            "PROBE_ONLY",
+            "CONTROLLED_EVALUATION"
+          ]
+        },
+        "method_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "$ref": "#/$defs/manifest"
+}
