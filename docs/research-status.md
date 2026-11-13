@@ -62,3 +62,11 @@ Assisted selection finds relevant records, but input totals reach 1.81 times com
 The current retrieval presentation does not meet the input-reduction objective.
 A numeric field has ambiguous duration-versus-slack semantics. Its mechanical scores cannot establish arithmetic gains.
 Selective reading remains experimental. Stable skill behavior is unchanged.
+
+## Compact retrieval follow-up
+
+The [compact logistics follow-up](evaluations/compact-logistics-probe.md) preserves all three synthetic conclusions and defined day fields in every response.
+Compact lexical retrieval reduces total input by 20.96% against same-batch raw text.
+Compact model selection still increases total input by 46.83%, including selector overhead.
+The lexical route also selects a weakly relevant method. Savings do not establish general retrieval quality.
+This remains an experimental helper outside stable skill behavior. Independent human review is pending.
