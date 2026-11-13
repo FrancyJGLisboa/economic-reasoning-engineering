@@ -1,6 +1,6 @@
 ---
 name: economic-reasoning-engineering
-description: Reconstruct evidence-backed economic reasoning from authorized technical documents, expert discussions, and transcripts. Extract traceable episodes, opinion cards, reasoning graphs, and reusable methods with validation and abstention. Use when asked to analyze or compile economic reasoning from source materials.
+description: Reconstruct evidence-backed economic reasoning and operational methods from authorized technical documents, expert discussions, and transcripts. Extract traceable episodes, opinion cards, reasoning graphs, and reusable methods with validation and abstention. Use when asked to reconstruct economic arguments or operational methods from source materials.
 ---
 
 # Economic Reasoning Engineering v0.3
@@ -31,6 +31,19 @@ Continue independent work when a missing detail does not block it.
 If tools or local execution are unavailable, return structured partial results and state the limitation.
 Do not describe unexecuted validation or an unbuilt package as complete.
 Return the analysis findings, a CONTEXT.md link, the validation result, and material evidence gaps.
+
+## Analysis profiles
+Select a profile from the requested decision and the source argument.
+Use `economics` for market, price, incentive, margin, policy, and allocation questions.
+Use `operations` for process, delivery, capacity, dependency, and failure-control questions.
+Without a question, select operations only when the main argument explains a process or operational constraint.
+Use economics when the purpose remains ambiguous. Do not ask the user to select a profile.
+Read only the selected profile: [economics](references/profiles/economics.md) or [operations](references/profiles/operations.md).
+Apply it with the shared rules in `references/MASTER_PROMPT.md`.
+Record `analysis_profile` in state.json with `name`, `selection_reason`, and `scope_limits`.
+Use profile names `economics` or `operations`. Keep scope limits as a nonempty list of explicit limits.
+Report the chosen profile in report.md. Preserve relevant secondary mechanisms without claiming a second profile.
+Every new method needs nonempty `expected_outputs` with named results and their interpretation.
 
 ## Agent workflow
 1. Identify authorized sources. Record their accessible locations, coverage and missing material.

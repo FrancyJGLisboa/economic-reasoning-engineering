@@ -67,6 +67,32 @@ def schema_check(value, spec, defs, path='$'):
         errors.append(path + ' must not be empty')
     return errors
 
+def profile_checks(data, manifest=None):
+    """Check declared profiles without inventing metadata for legacy extractions."""
+    errors = []
+    state = data['state']
+    if manifest is not None:
+        if ('analysis_profile' in state) != ('analysis_profile' in manifest):
+            errors.append('Analysis profile must appear in both state and manifest.')
+        elif state.get('analysis_profile') != manifest.get('analysis_profile'):
+            errors.append('Analysis profile differs between state and manifest.')
+    if 'analysis_profile' not in state:
+        return errors
+    profile = state['analysis_profile']
+    spec = {'type': 'object', 'required': ['name', 'selection_reason', 'scope_limits'],
+            'properties': {'name': {'enum': ['economics', 'operations']},
+                           'selection_reason': {'type': 'string', 'minLength': 1},
+                           'scope_limits': {'type': 'array', 'minItems': 1,
+                                            'items': {'type': 'string', 'minLength': 1}}}}
+    errors.extend(schema_check(profile, spec, {}, 'analysis_profile'))
+    output_spec = {'type': 'array', 'minItems': 1, 'items': {'type': 'string', 'minLength': 1}}
+    for card in data['reasoning_cards']:
+        if 'expected_outputs' not in card:
+            errors.append('Profiled method requires expected_outputs: ' + str(card.get('id')))
+        else:
+            errors.extend(schema_check(card['expected_outputs'], output_spec, {}, 'expected_outputs'))
+    return errors
+
 def records(data):
     for collection in COLLECTIONS:
         for i, record in enumerate(data.get(collection, [])):
@@ -197,6 +223,7 @@ def validate_package(root):
         for name, value in data.items():
             spec = contract['artifacts'][name]
             errors.extend(schema_check(value, spec, defs, name))
+        errors.extend(profile_checks(data, manifest))
         if errors:
             return errors, warnings
         expected_index = []
@@ -279,6 +306,9 @@ def build(project, destination, run_id, title):
     data = {name: load(source_out/f'{name}.json') for name in REQUIRED}
     if (source_out/'transfer_probe.json').is_file():
         data['transfer_probe'] = load(source_out/'transfer_probe.json')
+    profile_errors = profile_checks(data)
+    if profile_errors:
+        raise ValueError('; '.join(profile_errors))
     run_id = run_id or ('ere-' + hashlib.sha256(b''.join((source_out/f'{name}.json').read_bytes() for name in REQUIRED)).hexdigest()[:16])
     global_id(run_id, 'sources', 'check')
     destination.mkdir(parents=True, exist_ok=True)
@@ -358,11 +388,18 @@ def build(project, destination, run_id, title):
                     validation_claims={'semantic_truth': False, 'model_navigation_evaluation': 'NOT_RUN'},
                     routes={'overview': 'report.md', 'methods': 'reasoning_cards.json', 'opinions': 'opinions.json',
                             'data_gaps': 'data_requirements.json', 'graph': 'graph.json', 'source_evidence': 'sources.json'})
+    profile = data['state'].get('analysis_profile')
+    if profile is not None:
+        manifest['analysis_profile'] = profile
+    profile_text = ('Analysis profile: ' + profile['name'] + '. See manifest.json for selection reason and scope limits.'
+                    if profile is not None else 'Analysis profile: not recorded in this legacy extraction.')
     context = f'''Francy, start with this file to navigate the retained reasoning and evidence.
 
 # {title}
 
 Run ID: `{run_id}`. Package format: {VERSION}. Analysis date is not the source publication date.
+
+{profile_text}
 
 ## Read only the files needed for the current question
 
@@ -385,6 +422,7 @@ Line numbers locate the retained snapshot. They are not original video timestamp
 | Who expressed the opinion? | opinions.json | episode_id and attribution_status |
 | Which words support the method? | source_refs | filename, line and anchor in evidence/ |
 | What did the investigator add? | source_vs_inference | formulas and proposed operations |
+| What result should the method produce? | expected_outputs | units, interpretation and readiness |
 | What prevents application? | abstention_conditions | data_requirements.json and state.json |
 
 Optional commands use only Python's standard library:
@@ -409,7 +447,7 @@ Preserve those original fields. A broad record class does not replace their fine
 All navigation paths resolve from this directory. No original corpus directory is required.
 Missing sources and omitted text remain missing. A snapshot cannot recover them.
 Read source coverage and known losses in manifest.json before treating this as a complete transcript.
-The economic validity and freshness of these methods remain unverified.
+The domain validity and freshness of these methods remain unverified.
 Historical report sections can describe earlier validation. Use validation/ for this package's current receipts.
 Receipts bind the manifest and bundled validator. The manifest binds payload files.
 Any payload change requires a new manifest and validation receipt.

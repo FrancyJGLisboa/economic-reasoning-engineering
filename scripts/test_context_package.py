@@ -56,6 +56,110 @@ class PortableContextTests(unittest.TestCase):
             if p.is_file():entry.update(bytes=p.stat().st_size,sha256=cp.digest(p))
         cp.dump(self.package/'manifest.json',manifest)
 
+    def declare_profile(self, name='operations'):
+        state = cp.load(self.project/'output/state.json')
+        state['analysis_profile'] = {'name': name, 'selection_reason': 'Inspect delivery feasibility.',
+                                     'scope_limits': ['No observed shipment performance.']}
+        cp.dump(self.project/'output/state.json', state)
+        cards = cp.load(self.project/'output/reasoning_cards.json')
+        cards[0]['expected_outputs'] = ['Conditional exposure comparison in BRL per tonne.']
+        cp.dump(self.project/'output/reasoning_cards.json', cards)
+
+    def test_declared_profiles_survive_relocation(self):
+        for name in ('economics', 'operations'):
+            with self.subTest(profile=name):
+                self.declare_profile(name)
+                package = self.root/name
+                cp.build(self.project, package, name, 'Declared profile')
+                relocated = self.root/(name + '-relocated')
+                shutil.move(str(package), str(relocated))
+                self.assertEqual(cp.validate_package(relocated), ([], []))
+                profile = cp.load(relocated/'manifest.json')['analysis_profile']
+                self.assertEqual(profile, cp.load(relocated/'state.json')['analysis_profile'])
+                self.assertEqual(profile['name'], name)
+                self.assertIn('Analysis profile: ' + name, (relocated/'CONTEXT.md').read_text())
+                self.assertTrue(cp.query(relocated, name + '::reasoning_cards::m1')['record']['expected_outputs'])
+
+    def test_legacy_profile_is_not_fabricated(self):
+        self.assertNotIn('analysis_profile', cp.load(self.package/'manifest.json'))
+        self.assertIn('not recorded', (self.package/'CONTEXT.md').read_text())
+        self.assertEqual(cp.validate_package(self.package), ([], []))
+
+    def test_invalid_profile_refused_before_writing(self):
+        self.declare_profile('strategy')
+        destination = self.root/'invalid-profile'
+        with self.assertRaisesRegex(ValueError, 'unsupported value'):
+            cp.build(self.project, destination, 'bad-profile', 'Invalid')
+        self.assertFalse(destination.exists())
+
+    def test_profile_requires_selection_reason_and_limits(self):
+        self.declare_profile()
+        state_path = self.project/'output/state.json'
+        for change in ({'selection_reason': ''}, {'scope_limits': []}):
+            state = cp.load(state_path)
+            state['analysis_profile'].update(change)
+            cp.dump(state_path, state)
+            with self.assertRaises(ValueError):
+                cp.build(self.project, self.root/'bad-metadata', 'bad', 'Invalid metadata')
+            self.declare_profile()
+
+    def test_profile_requires_method_outputs(self):
+        self.declare_profile()
+        cards_path = self.project/'output/reasoning_cards.json'
+        cards = cp.load(cards_path)
+        for value in (None, [], [''], 'delivery'):
+            if value is None:
+                cards[0].pop('expected_outputs', None)
+            else:
+                cards[0]['expected_outputs'] = value
+            cp.dump(cards_path, cards)
+            with self.assertRaises(ValueError):
+                cp.build(self.project, self.root/'missing-outputs', 'bad', 'Missing outputs')
+
+    def test_profile_mismatch_refused_with_refreshed_hashes(self):
+        self.declare_profile()
+        package = self.root/'profiled'
+        cp.build(self.project, package, 'profiled', 'Profiled')
+        self.package = package
+        self.mutate('manifest.json', lambda x: x['analysis_profile'].update(name='economics'))
+        self.assertTrue(any('differs' in e for e in cp.validate_package(package)[0]))
+
+    def test_profile_cannot_be_removed_only_from_manifest(self):
+        self.declare_profile()
+        package = self.root/'profiled'
+        cp.build(self.project, package, 'profiled', 'Profiled')
+        self.package = package
+        self.mutate('manifest.json', lambda x: x.pop('analysis_profile'))
+        self.assertTrue(any('both state and manifest' in e for e in cp.validate_package(package)[0]))
+
+    def test_profiled_package_rejects_removed_method_outputs(self):
+        self.declare_profile()
+        package = self.root/'profiled'
+        cp.build(self.project, package, 'profiled', 'Profiled')
+        self.package = package
+        self.mutate('reasoning_cards.json', lambda x: x[0].pop('expected_outputs'))
+        self.assertTrue(any('requires expected_outputs' in e for e in cp.validate_package(package)[0]))
+        with self.assertRaises(ValueError):
+            cp.query(package, 'profiled::reasoning_cards::m1')
+
+    def test_profile_cannot_be_removed_only_from_state(self):
+        self.declare_profile()
+        package = self.root/'profiled'
+        cp.build(self.project, package, 'profiled', 'Profiled')
+        self.package = package
+        self.mutate('state.json', lambda x: x.pop('analysis_profile'))
+        self.assertTrue(any('both state and manifest' in e for e in cp.validate_package(package)[0]))
+
+    def test_working_validator_checks_declared_profile(self):
+        import validate
+        self.declare_profile('unknown')
+        self.assertTrue(any('unsupported value' in e for e in validate.validate(self.project)[0]))
+        self.declare_profile()
+        cards = cp.load(self.project/'output/reasoning_cards.json')
+        cards[0].pop('expected_outputs')
+        cp.dump(self.project/'output/reasoning_cards.json', cards)
+        self.assertTrue(any('requires expected_outputs' in e for e in validate.validate(self.project)[0]))
+
     def test_valid_nonempty_package(self):
         self.assertEqual(cp.validate_package(self.package),([],[]))
         self.assertGreater(len(cp.load(self.package/'manifest.json')['records']),0)

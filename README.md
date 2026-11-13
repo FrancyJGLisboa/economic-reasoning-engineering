@@ -41,6 +41,17 @@ The result includes an analysis summary, a link to `output/CONTEXT.md`, a valida
 The agent asks for more information only when it cannot access the material or a missing requirement prevents analysis.
 If the environment cannot read the material or execute validation, the agent reports that limit. It does not claim a complete package.
 
+## Analysis profiles
+
+Economics remains the default for markets, prices, incentives, margins, and policy questions.
+The operations profile covers processes, delivery feasibility, capacity, dependencies, and failure controls.
+The agent selects the profile from your question and the source argument. You do not need to configure it.
+Without a question, a process explanation can select operations. Ambiguous purposes use economics.
+
+Each new package records the selected profile, its selection reason, and its scope limits.
+New methods state their expected outputs alongside inputs, operations, and abstention conditions.
+Legacy format 0.3 packages remain readable without these optional declarations.
+
 ## What the skill produces
 
 The skill converts documents, transcripts, and expert discussions into two layers:

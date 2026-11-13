@@ -43,6 +43,8 @@ These classes describe origin. They do not describe truth or validation strength
 
 A reusable reasoning card needs a trigger, named inputs, ordered operations, competing explanations, a discrimination test, and abstention conditions.
 
+Declared-profile runs also require nonempty `expected_outputs`. Legacy runs can omit that field.
+
 The card must identify source evidence and investigator additions. Missing method detail requires abstention.
 
 ## Integrity

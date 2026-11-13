@@ -103,6 +103,10 @@ def validate(project=None):
         for i,item in enumerate(items):
             if isinstance(item,dict) and "episode_id" in item and item["episode_id"] not in ids.get("episodes",set()):
                 errors.append(f"{name}[{i}] unknown episode_id")
+    if isinstance(state,dict) and 'analysis_profile' in state and isinstance(cards,list):
+        if all(isinstance(card,dict) for card in cards):
+            from context_package import profile_checks
+            errors.extend(profile_checks({'state': state, 'reasoning_cards': cards}))
     return errors,warnings
 
 if __name__=="__main__":

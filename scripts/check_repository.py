@@ -18,6 +18,8 @@ REQUIRED = (
     "agents/openai.yaml",
     "references/MASTER_PROMPT.md",
     "references/PORTABLE_CONTEXT.md",
+    "references/profiles/economics.md",
+    "references/profiles/operations.md",
     "schemas/package.schema.json",
     "scripts/context_package.py",
     "scripts/validate.py",

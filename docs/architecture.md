@@ -10,7 +10,7 @@ The agent performs source interpretation. Python tools enforce deterministic pac
 
 ### Skill entry point
 
-`SKILL.md` tells an agent when to use the skill and how to run the workflow. It routes detailed work to the two maintained references.
+`SKILL.md` tells an agent when to use the skill and how to run the workflow. It routes shared work to the master prompt and portable contract. It loads only the selected domain profile.
 
 ### Extraction contract
 
@@ -73,3 +73,11 @@ Model-level navigation and economic quality require separate evaluation. Determi
 The Python tools support Python 3.9 or newer. They use only the standard library.
 
 The Markdown skill format supports file-based agent skill discovery. Each agent product controls its own discovery and invocation behavior.
+
+## Domain profiles
+
+The master prompt defines the shared evidence workflow.
+The economics and operations references define domain-specific episode selection, method operations, outputs, and failure checks.
+Profile selection uses the requested decision and source argument. Economics remains the default for ambiguous purposes.
+The builder preserves declared profile metadata in state and manifest. The validator checks consistency and method output declarations.
+Legacy runs can omit profile metadata. Deterministic checks cannot establish correct domain selection.

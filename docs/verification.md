@@ -17,6 +17,7 @@ The unit suite must report a nonzero test count and return exit code 0.
 The current tests cover:
 
 - Valid and invalid working extractions.
+- Declared profiles, required method outputs, metadata consistency, and legacy compatibility.
 - Exact source-anchor checks.
 - Missing and mismatched source evidence.
 - Cross-record identifier integrity.

@@ -61,6 +61,22 @@ Retain source author, date, geography, units, vintage and uncertainty whenever k
 Use null or unknown for missing metadata. Never invent a value to satisfy the schema.
 Review schemas before adapting records from older runs.
 
+## Analysis profiles
+
+New runs record `analysis_profile` in state.json. The builder copies it into manifest.json.
+The object contains `name`, `selection_reason`, and `scope_limits`.
+Supported names are `economics` and `operations`. Scope limits form a nonempty list of strings.
+The manifest and state must agree. Unknown profiles fail validation.
+The entry point displays the selected profile and routes readers to its reason and limits.
+
+Methods in declared-profile runs require `expected_outputs`, a nonempty list of descriptive strings.
+Describe result names, units, and interpretation when relevant. Expected results are not verified results.
+These declarations do not prove correct profile selection or method quality.
+
+Legacy format 0.3 packages can omit profile metadata and expected outputs.
+The builder preserves that absence. It does not invent a historical profile.
+The runtime checks conditional requirements because the schema checker implements only a limited keyword set.
+
 ## Commands
 Build a new package:
 ```text
