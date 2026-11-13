@@ -160,6 +160,165 @@ class PortableContextTests(unittest.TestCase):
         cp.dump(self.project/'output/reasoning_cards.json', cards)
         self.assertTrue(any('requires expected_outputs' in e for e in validate.validate(self.project)[0]))
 
+    def declare_faithful(self, critique=False):
+        state_path = self.project/'output/state.json'
+        state = cp.load(state_path)
+        state['extraction_mode'] = 'faithful_with_critique' if critique else 'faithful'
+        if critique:
+            state['critique_authorization'] = 'User requests a separate arithmetic and method critique.'
+        cp.dump(state_path, state)
+        anchor = 'Compare the invoice currency with the payment currency before judging exposure.'
+        (self.project/'corpus/source.txt').write_text('Speaker A: ' + anchor + '\n')
+        for name in ('episodes', 'opinions', 'reasoning_cards', 'data_requirements'):
+            items = cp.load(self.project/'output'/(name + '.json'))
+            for item in items:
+                item['source_refs'] = [{'source_id': 's1', 'locator': 'anchor: ' + anchor}]
+            cp.dump(self.project/'output'/(name + '.json'), items)
+        graph = cp.load(self.project/'output/graph.json')
+        graph['nodes'][0]['source_refs'] = [{'source_id': 's1', 'locator': 'anchor: ' + anchor}]
+        cp.dump(self.project/'output/graph.json', graph)
+        cards = cp.load(self.project/'output/reasoning_cards.json')
+        cards[0].update(method_origin='DOCUMENTED', attributed_to='Speaker A',
+                        documentation_gaps=['No numerical threshold or competing hypothesis is documented.'],
+                        operational_readiness='DOCUMENTED_FRAGMENT',
+                        competing_hypotheses=['NOT_DOCUMENTED'], discrimination_test='NOT_DOCUMENTED',
+                        abstention_conditions=['NOT_DOCUMENTED'],
+                        source_vs_inference={'source': anchor, 'investigator': 'Organized the stated comparison. No added procedure.'})
+        cards[0]['ordered_steps'] = [{'order': 1, 'action': anchor, 'readiness': 'KNOWLEDGE_ONLY',
+                                     'evidence_basis': 'STATED', 'evidence_ref_indexes': [0]}]
+        cp.dump(self.project/'output/reasoning_cards.json', cards)
+
+    def build_faithful(self):
+        self.package = self.root/'faithful'
+        return cp.build(self.project, self.package, 'faithful', 'Documented speaker comparison')
+
+    def test_faithful_fragment_survives_relocation_without_completion(self):
+        self.declare_faithful()
+        self.build_faithful()
+        relocated = self.root/'moved-faithful'
+        shutil.move(str(self.package), str(relocated))
+        shutil.rmtree(self.project)
+        self.assertEqual(cp.validate_package(relocated), ([], []))
+        result = cp.query(relocated, 'faithful::reasoning_cards::m1', True)
+        self.assertEqual(result['record']['attributed_to'], 'Speaker A')
+        self.assertEqual(result['record']['record_class'], 'source_statement')
+        self.assertEqual(result['record']['operational_readiness'], 'DOCUMENTED_FRAGMENT')
+        self.assertEqual(result['record']['discrimination_test'], 'NOT_DOCUMENTED')
+        self.assertEqual(result['record']['ordered_steps'][0]['evidence_ref_indexes'], [0])
+        self.assertIn('invoice currency', result['evidence'][0]['quote'])
+        self.assertFalse((relocated/'critique.json').exists())
+        self.assertEqual(cp.load(relocated/'manifest.json')['extraction_mode'], 'faithful')
+
+    def test_legacy_mode_is_not_invented(self):
+        self.assertNotIn('extraction_mode', cp.load(self.package/'manifest.json'))
+        self.assertEqual(cp.query(self.package, self.gid)['record']['record_class'], 'investigator_proposal')
+
+    def test_critique_is_separate_indexed_and_queryable(self):
+        self.declare_faithful(critique=True)
+        critique = [{'id': 'c1', 'episode_id': 'e1', 'kind': 'METHOD_PROPOSAL',
+                     'assessment': 'Investigator proposes a documented exposure inventory. Not the speaker method.',
+                     'source_refs': cp.load(self.project/'output/reasoning_cards.json')[0]['source_refs']}]
+        cp.dump(self.project/'output/critique.json', critique)
+        self.build_faithful()
+        relocated = self.root/'moved-critique'
+        shutil.move(str(self.package), str(relocated))
+        self.assertEqual(cp.validate_package(relocated), ([], []))
+        manifest = cp.load(relocated/'manifest.json')
+        self.assertEqual(manifest['routes']['investigator_critique'], 'critique.json')
+        result = cp.query(relocated, 'faithful::critique::c1', True)
+        self.assertEqual(result['record']['record_class'], 'investigator_proposal')
+        self.assertTrue(result['evidence'])
+        self.assertEqual(cp.query(relocated, 'faithful::reasoning_cards::m1')['record']['ordered_steps'][0]['evidence_basis'], 'STATED')
+
+    def test_critique_refused_without_explicit_mode(self):
+        cp.dump(self.project/'output/critique.json', [])
+        with self.assertRaisesRegex(ValueError, 'Critique requires'):
+            self.build_faithful()
+        self.assertFalse(self.package.exists())
+
+    def test_critique_refused_in_faithful_mode_even_when_empty(self):
+        self.declare_faithful()
+        cp.dump(self.project/'output/critique.json', [])
+        with self.assertRaisesRegex(ValueError, 'Critique requires'):
+            self.build_faithful()
+
+    def test_critique_requires_nonblank_authorization(self):
+        self.declare_faithful(critique=True)
+        state = cp.load(self.project/'output/state.json')
+        state['critique_authorization'] = ' '
+        cp.dump(self.project/'output/state.json', state)
+        with self.assertRaisesRegex(ValueError, 'critique_authorization'):
+            self.build_faithful()
+
+    def test_invalid_extraction_modes_are_refused(self):
+        for mode in (None, '', 'improve', 1):
+            state = cp.load(self.project/'output/state.json')
+            state['extraction_mode'] = mode
+            cp.dump(self.project/'output/state.json', state)
+            with self.assertRaisesRegex(ValueError, 'extraction_mode'):
+                self.build_faithful()
+
+    def test_mode_drift_refused_with_updated_hashes(self):
+        self.declare_faithful()
+        self.build_faithful()
+        self.mutate('manifest.json', lambda x: x.pop('extraction_mode'))
+        self.assertTrue(any('Fidelity metadata differs' in e for e in cp.validate_package(self.package)[0]))
+
+    def test_unauthorized_critique_refused_after_resealing(self):
+        self.declare_faithful(critique=True)
+        cp.dump(self.project/'output/critique.json', [])
+        self.build_faithful()
+        self.mutate('state.json', lambda x: x.pop('critique_authorization'))
+        self.mutate('manifest.json', lambda x: x.pop('critique_authorization'))
+        self.assertTrue(any('critique_authorization' in e for e in cp.validate_package(self.package)[0]))
+
+    def test_proposed_steps_cannot_be_labeled_documented(self):
+        self.declare_faithful()
+        path = self.project/'output/reasoning_cards.json'
+        cards = cp.load(path)
+        cards[0]['ordered_steps'][0]['evidence_basis'] = 'INVESTIGATOR_PROPOSAL'
+        cp.dump(path, cards)
+        with self.assertRaisesRegex(ValueError, 'evidence_basis'):
+            self.build_faithful()
+
+    def test_step_reference_must_resolve(self):
+        self.declare_faithful()
+        path = self.project/'output/reasoning_cards.json'
+        for indexes in ([], [-1], [1], [True], ['0']):
+            cards = cp.load(path)
+            cards[0]['ordered_steps'][0]['evidence_ref_indexes'] = indexes
+            cp.dump(path, cards)
+            with self.assertRaisesRegex(ValueError, 'evidence_ref_indexes'):
+                self.build_faithful()
+
+    def test_faithful_methods_require_origin_attribution_and_gaps(self):
+        for field in ('method_origin', 'attributed_to', 'documentation_gaps'):
+            self.declare_faithful()
+            path = self.project/'output/reasoning_cards.json'
+            cards = cp.load(path)
+            cards[0].pop(field)
+            cp.dump(path, cards)
+            with self.assertRaises(ValueError):
+                self.build_faithful()
+
+    def test_faithful_methods_cannot_retain_proposal_class(self):
+        self.declare_faithful()
+        path = self.project/'output/reasoning_cards.json'
+        cards = cp.load(path)
+        cards[0]['record_class'] = 'investigator_proposal'
+        cp.dump(path, cards)
+        with self.assertRaisesRegex(ValueError, 'source_statement'):
+            self.build_faithful()
+
+    def test_working_validator_checks_fidelity(self):
+        import validate
+        self.declare_faithful()
+        path = self.project/'output/reasoning_cards.json'
+        cards = cp.load(path)
+        cards[0]['ordered_steps'][0]['evidence_ref_indexes'] = [90]
+        cp.dump(path, cards)
+        self.assertTrue(any('evidence_ref_indexes' in e for e in validate.validate(self.project)[0]))
+
     def test_valid_nonempty_package(self):
         self.assertEqual(cp.validate_package(self.package),([],[]))
         self.assertGreater(len(cp.load(self.package/'manifest.json')['records']),0)

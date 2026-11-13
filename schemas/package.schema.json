@@ -263,6 +263,19 @@
               "readiness": {
                 "type": "string",
                 "minLength": 1
+              },
+              "evidence_basis": {
+                "enum": [
+                  "STATED",
+                  "DEMONSTRATED"
+                ]
+              },
+              "evidence_ref_indexes": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "integer"
+                }
               }
             }
           }
@@ -317,6 +330,20 @@
         "expected_outputs": {
           "type": "array",
           "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "method_origin": {
+          "const": "DOCUMENTED"
+        },
+        "attributed_to": {
+          "type": "string",
+          "minLength": 1
+        },
+        "documentation_gaps": {
+          "type": "array",
           "items": {
             "type": "string",
             "minLength": 1
@@ -516,6 +543,16 @@
         },
         "analysis_profile": {
           "$ref": "#/$defs/analysis_profile"
+        },
+        "extraction_mode": {
+          "enum": [
+            "faithful",
+            "faithful_with_critique"
+          ]
+        },
+        "critique_authorization": {
+          "type": "string",
+          "minLength": 1
         }
       }
     },
@@ -705,6 +742,16 @@
         },
         "analysis_profile": {
           "$ref": "#/$defs/analysis_profile"
+        },
+        "extraction_mode": {
+          "enum": [
+            "faithful",
+            "faithful_with_critique"
+          ]
+        },
+        "critique_authorization": {
+          "type": "string",
+          "minLength": 1
         }
       }
     },
@@ -745,6 +792,59 @@
         "method_id": {
           "type": "string",
           "minLength": 1
+        }
+      }
+    },
+    "critique": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "global_id",
+          "record_class",
+          "episode_id",
+          "kind",
+          "assessment",
+          "source_refs"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "global_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "record_class": {
+            "enum": [
+              "investigator_proposal",
+              "test_result"
+            ]
+          },
+          "episode_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "DOMAIN_CRITIQUE",
+              "METHOD_PROPOSAL",
+              "ARITHMETIC_CHECK"
+            ]
+          },
+          "assessment": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/$defs/source_ref"
+            }
+          }
         }
       }
     }

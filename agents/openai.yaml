@@ -1,6 +1,6 @@
 interface:
   display_name: "Economic Reasoning Engineering"
-  short_description: "Extract economic reasoning and operational methods"
-  default_prompt: "Use $economic-reasoning-engineering to reconstruct economic arguments or operational methods and deliver evidence-backed registries, playbooks, and a portable context package."
+  short_description: "Preserve documented judgment and reasoning methods"
+  default_prompt: "Use $economic-reasoning-engineering to faithfully preserve documented context, judgments, and methods in a portable context package. Keep missing details explicit and critique optional."
 policy:
   allow_implicit_invocation: true

@@ -10,7 +10,7 @@ The repository root is also the installable skill directory.
 Read these files before you change behavior:
 
 1. `SKILL.md`
-2. `references/MASTER_PROMPT.md`
+2. `references/MASTER_PROMPT.md` and `references/FAITHFUL_EXTRACTION.md`
 3. `references/PORTABLE_CONTEXT.md`
 4. `docs/architecture.md`
 5. `docs/verification.md`
@@ -25,6 +25,8 @@ Do not add private paths, tokens, credentials, or personal evaluation artifacts.
 
 ## Change rules
 
+Default to faithful extraction. Preserve documented fragments and source arithmetic.
+Keep optional critique separate and require an explicit user request.
 Keep source statements, analyst inference, and investigator proposals separate.
 Preserve local identifier behavior and global identifier format.
 Do not weaken path confinement or overwrite protection.

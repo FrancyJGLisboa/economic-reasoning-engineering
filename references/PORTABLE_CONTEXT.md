@@ -61,6 +61,35 @@ Retain source author, date, geography, units, vintage and uncertainty whenever k
 Use null or unknown for missing metadata. Never invent a value to satisfy the schema.
 Review schemas before adapting records from older runs.
 
+## Faithful extraction and optional critique
+
+New runs declare `extraction_mode` in state.json. The builder preserves it in manifest.json and CONTEXT.md.
+Supported modes are `faithful` and `faithful_with_critique`.
+Default extraction uses `faithful`. The agent does not improve or correct the speaker's method.
+Critique requires `faithful_with_critique` and a nonempty `critique_authorization` recording the user's explicit request.
+Both metadata fields must agree between state and manifest.
+The validator checks declarations. It cannot authenticate user authorization from a string.
+
+Declared faithful methods require `method_origin: "DOCUMENTED"`, `attributed_to`, and `documentation_gaps`.
+Each ordered step requires `evidence_basis` as `STATED` or `DEMONSTRATED`.
+Each step also requires nonempty `evidence_ref_indexes` into its parent method's zero-based `source_refs` array.
+These references locate the passage. Deterministic checks cannot prove that the passage supports the step.
+Documented methods use `record_class: "source_statement"`. This class does not establish truth.
+
+Incomplete methods can use `DOCUMENTED_FRAGMENT`. Missing details remain `NOT_DOCUMENTED`.
+Do not infer speaker abstention rules from extraction gaps.
+The reader must inspect attribution, step evidence, and gaps before applying a method.
+
+Optional `critique.json` contains separately indexed investigator assessments.
+Each record has id, episode_id, kind, assessment, source_refs, global_id, and record_class.
+Kinds are `DOMAIN_CRITIQUE`, `METHOD_PROPOSAL`, and `ARITHMETIC_CHECK`.
+Critique records use `investigator_proposal` or `test_result`. They never become documented speaker methods.
+The manifest supplies an investigator_critique route when the artifact exists.
+A critique file is refused outside explicitly declared critique mode, even when the array is empty.
+
+Legacy packages can omit these fields. The builder never relabels old methods as documented speaker procedures.
+Use each new package's bundled reader for the optional critique collection.
+
 ## Analysis profiles
 
 New runs record `analysis_profile` in state.json. The builder copies it into manifest.json.

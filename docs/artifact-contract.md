@@ -41,11 +41,14 @@ These classes describe origin. They do not describe truth or validation strength
 
 ## Reasoning method minimum
 
-A reusable reasoning card needs a trigger, named inputs, ordered operations, competing explanations, a discrimination test, and abstention conditions.
+The base card schema retains trigger, inputs, operations, alternatives, tests, and abstention fields.
+Faithful extraction uses explicit NOT_DOCUMENTED values when the source omits these details.
 
 Declared-profile runs also require nonempty `expected_outputs`. Legacy runs can omit that field.
 
-The card must identify source evidence and investigator additions. Missing method detail requires abstention.
+Documented cards identify their speaker and link each step to their source evidence.
+Missing method detail creates a documentation gap. It does not require inventing or rejecting a documented fragment.
+Speaker abstention rules remain separate from extraction gaps.
 
 ## Integrity
 
@@ -58,3 +61,12 @@ Any payload change invalidates an earlier passing receipt. Receipt verification 
 Additive optional fields can remain within v0.3 when older readers ignore them safely.
 
 Changes to required fields, identifier semantics, hashes, or refusal behavior require a format review and migration plan.
+
+## Fidelity metadata
+
+Declared modes and step evidence follow the normative portable contract.
+Critique remains optional, authorized, separately indexed, and outside documented speaker methods.
+Legacy packages retain their original provenance and mode absence.
+The extension uses optional fields with conditional checks for explicitly declared modes.
+Existing package format, identifiers, hashes, and legacy refusal behavior remain unchanged.
+New critique collections require the package's bundled reader. Older readers do not support the new collection.

@@ -17,6 +17,7 @@ REQUIRED = (
     "SECURITY.md",
     "agents/openai.yaml",
     "references/MASTER_PROMPT.md",
+    "references/FAITHFUL_EXTRACTION.md",
     "references/PORTABLE_CONTEXT.md",
     "references/profiles/economics.md",
     "references/profiles/operations.md",

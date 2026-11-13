@@ -2,7 +2,9 @@
 
 [![CI](https://github.com/FrancyJGLisboa/economic-reasoning-engineering/actions/workflows/ci.yml/badge.svg)](https://github.com/FrancyJGLisboa/economic-reasoning-engineering/actions/workflows/ci.yml)
 
-Economic Reasoning Engineering is an agent skill for reconstructing economic arguments from authorized source material. It produces traceable opinions, reasoning methods, and portable context packages.
+Economic Reasoning Engineering preserves documented context, judgments, and methods from authorized source material. It supports economic arguments and operational processes.
+
+The default mode reconstructs what speakers state or demonstrate. It keeps missing details visible and produces a portable context package.
 
 Version 0.3 is the current stable format. It uses Python's standard library and supports Python 3.9 or newer.
 
@@ -41,6 +43,21 @@ The result includes an analysis summary, a link to `output/CONTEXT.md`, a valida
 The agent asks for more information only when it cannot access the material or a missing requirement prevents analysis.
 If the environment cannot read the material or execute validation, the agent reports that limit. It does not claim a complete package.
 
+## Faithful extraction by default
+
+The skill preserves questions, evidence choices, criteria, methods, uncertainty, disagreements, and revisions documented in the material.
+It checks whether the extraction matches the source. It does not improve the speaker's method during default extraction.
+Incomplete methods remain documented fragments. Missing criteria, tests, or outputs remain `NOT_DOCUMENTED`.
+Each documented method identifies its speaker. Each step points to exact source evidence.
+
+Critique, arithmetic correction, and method improvement require an explicit request.
+When requested, assessments appear in a separate indexed `critique.json` artifact. The documented method remains intact.
+A request to analyze supplied material does not authorize critique by itself.
+
+The package can help an agent apply documented criteria to a new case.
+It does not establish identical judgment, a complete personal context, or actual workplace behavior beyond the supplied evidence.
+Behavioral similarity requires comparison with actual decisions that were withheld from extraction.
+
 ## Analysis profiles
 
 Economics remains the default for markets, prices, incentives, margins, and policy questions.
@@ -49,7 +66,7 @@ The agent selects the profile from your question and the source argument. You do
 Without a question, a process explanation can select operations. Ambiguous purposes use economics.
 
 Each new package records the selected profile, its selection reason, and its scope limits.
-New methods state their expected outputs alongside inputs, operations, and abstention conditions.
+New methods preserve documented outputs, inputs, operations, and abstention conditions. Missing details remain explicit.
 Legacy format 0.3 packages remain readable without these optional declarations.
 
 ## What the skill produces
@@ -61,7 +78,7 @@ The skill converts documents, transcripts, and expert discussions into two layer
 
 The portable output is a file-based context package. An agent can inspect it without the original conversation or working directory.
 
-The package preserves evidence and judgment boundaries. It does not prove that an economic claim is true.
+The package preserves speaker attribution, evidence, judgment boundaries, and documentation gaps. It does not prove that an economic claim is true.
 
 ## Processing model
 
@@ -116,6 +133,7 @@ Direct Python commands are optional. See the [manual workflow reference](docs/ma
 |---|---|
 | [`SKILL.md`](SKILL.md) | Agent entry point and workflow |
 | [`references/MASTER_PROMPT.md`](references/MASTER_PROMPT.md) | Extraction phases and evidence rules |
+| [`references/FAITHFUL_EXTRACTION.md`](references/FAITHFUL_EXTRACTION.md) | Default fidelity rules and optional critique |
 | [`references/PORTABLE_CONTEXT.md`](references/PORTABLE_CONTEXT.md) | Portable package contract |
 | [`schemas/package.schema.json`](schemas/package.schema.json) | Structured artifact definitions |
 | [`scripts/context_package.py`](scripts/context_package.py) | Package builder, reader, and validator |

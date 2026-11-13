@@ -14,7 +14,7 @@ The agent performs source interpretation. Python tools enforce deterministic pac
 
 ### Extraction contract
 
-`references/MASTER_PROMPT.md` defines eight extraction phases. It also defines evidence classes, refusal rules, and completion conditions.
+`references/MASTER_PROMPT.md` defines eight extraction phases. It also defines evidence classes, refusal rules, and completion conditions. The fidelity contract controls default extraction and optional critique.
 
 The working extraction lives under `<run>/working/`:
 
@@ -81,3 +81,11 @@ The economics and operations references define domain-specific episode selection
 Profile selection uses the requested decision and source argument. Economics remains the default for ambiguous purposes.
 The builder preserves declared profile metadata in state and manifest. The validator checks consistency and method output declarations.
 Legacy runs can omit profile metadata. Deterministic checks cannot establish correct domain selection.
+
+## Faithful extraction boundary
+
+New runs preserve documented methods with speaker attribution and per-step evidence indexes.
+The agent checks source fidelity. It does not assess domain correctness by default.
+Optional critique uses a separate collection and requires recorded user authorization.
+The builder indexes this collection and preserves its separation during navigation and relocation.
+Deterministic validation checks declarations and references. It cannot verify semantic entailment or identical personal judgment.

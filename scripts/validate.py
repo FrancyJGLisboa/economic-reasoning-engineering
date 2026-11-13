@@ -107,6 +107,15 @@ def validate(project=None):
         if all(isinstance(card,dict) for card in cards):
             from context_package import profile_checks
             errors.extend(profile_checks({'state': state, 'reasoning_cards': cards}))
+    if isinstance(state,dict) and isinstance(cards,list):
+        from context_package import fidelity_checks
+        fidelity_data = {'state': state, 'reasoning_cards': cards}
+        if (out/'critique.json').is_file():
+            try:
+                fidelity_data['critique'] = json.loads((out/'critique.json').read_text(encoding='utf-8'))
+            except (OSError, ValueError) as exc:
+                errors.append('Invalid critique: ' + str(exc))
+        errors.extend(fidelity_checks(fidelity_data))
     return errors,warnings
 
 if __name__=="__main__":
