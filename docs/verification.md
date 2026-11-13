@@ -46,6 +46,7 @@ Those claims need separate evidence. Record human evaluation by evaluator, metho
 
 ## Continuous integration
 
-GitHub Actions runs the checks on Python 3.9, 3.11, and 3.13. The workflow uses no project dependency installation step.
+GitHub Actions runs the checks on Python 3.9, 3.11, and 3.13 with Ubuntu 24.04.
+The runner image is fixed because Python 3.9 builds are unavailable for Ubuntu 26.04. The workflow uses no project dependency installation step.
 
 The local environment can test another supported Python version. State that version in verification evidence.

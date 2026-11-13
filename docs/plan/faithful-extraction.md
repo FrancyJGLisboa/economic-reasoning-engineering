@@ -63,3 +63,11 @@ Package format 0.3 remains stable for legacy runs. No old mode or speaker proven
 New extraction declarations opt into conditional requirements.
 The optional critique collection requires the new package's bundled reader.
 Historical packages and prior extraction outputs remain unchanged.
+
+## CI environment correction
+
+The first remote run failed during Python 3.9 setup on the new Ubuntu 26.04 default image.
+No Python 3.9 tests ran in that job. Local tests and remote Python 3.11 and 3.13 tests passed.
+The official actions/python-versions manifest lists Python 3.9.25 builds for Ubuntu 24.04 and 22.04.
+The CI runner now uses Ubuntu 24.04 to retain the declared Python compatibility matrix.
+Source: https://raw.githubusercontent.com/actions/python-versions/main/versions-manifest.json
