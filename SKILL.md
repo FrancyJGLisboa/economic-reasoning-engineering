@@ -15,7 +15,24 @@ Keep automatic selection available for matching requests.
 Resolve supporting files relative to this SKILL.md file.
 Use a writable project directory for outputs. Never use this installation directory as the output project.
 
-## Workflow
+## User interaction contract
+The user invokes this skill and supplies material. That is sufficient to start.
+Accept pasted text, attachments, readable local files, and links accessible through authorized tools.
+A focused analysis question is optional. If the user supplies no question, infer a bounded economic reasoning extraction.
+
+The following workflow belongs to the agent. Do not ask the user to create folders or run its commands.
+Create a unique run directory inside the current writable project unless the user specifies a destination.
+If the current directory is a skill installation, choose another writable workspace location.
+Never write investigation outputs inside the skill installation.
+Derive the title and run name from the supplied material. Do not ask for these routine choices.
+Prepare source text, generate artifacts, run checks, and build the portable package yourself.
+Ask only when material is inaccessible or a missing requirement blocks useful analysis.
+Continue independent work when a missing detail does not block it.
+If tools or local execution are unavailable, return structured partial results and state the limitation.
+Do not describe unexecuted validation or an unbuilt package as complete.
+Return the analysis findings, a CONTEXT.md link, the validation result, and material evidence gaps.
+
+## Agent workflow
 1. Identify authorized sources. Record their accessible locations, coverage and missing material.
 2. Read `references/MASTER_PROMPT.md` fully. Read `references/PORTABLE_CONTEXT.md` before creating the deliverables.
 3. Use `<run>/working/corpus/` for source preparation. Write extraction artifacts in `<run>/working/output/`.

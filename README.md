@@ -6,6 +6,41 @@ Economic Reasoning Engineering is an agent skill for reconstructing economic arg
 
 Version 0.3 is the current stable format. It uses Python's standard library and supports Python 3.9 or newer.
 
+## Quick start
+
+After the one-time installation, your normal workflow has two steps:
+
+1. Invoke the skill in your agent.
+2. Paste the material, attach a readable file, or provide its accessible location.
+
+In Codex:
+
+```text
+$economic-reasoning-engineering
+
+Analyze the material below:
+[paste your transcript or document]
+```
+
+In Claude Code:
+
+```text
+/economic-reasoning-engineering
+
+Analyze the material below:
+[paste your transcript or document]
+```
+
+You can also attach the material or include its path in the same request.
+An optional question can focus the analysis. It is not required.
+
+The agent creates the run directory, prepares sources, extracts the reasoning, validates the artifacts, and builds the portable package.
+You do not need to create folders, run Python commands, edit configuration, or choose an artifact schema for each analysis.
+
+The result includes an analysis summary, a link to `output/CONTEXT.md`, a validation receipt, and the remaining evidence gaps.
+The agent asks for more information only when it cannot access the material or a missing requirement prevents analysis.
+If the environment cannot read the material or execute validation, the agent reports that limit. It does not claim a complete package.
+
 ## What the skill produces
 
 The skill converts documents, transcripts, and expert discussions into two layers:
@@ -47,7 +82,9 @@ ln -s "$skill_store/economic-reasoning-engineering" \
 
 Stop if either destination already exists. Inspect the existing installation before you replace it.
 
-Restart the agent after installation. Invoke the skill as `$economic-reasoning-engineering` in Codex. Invoke it as `/economic-reasoning-engineering` in Claude Code.
+The installation is a one-time setup. If the skill does not appear, start a new agent session.
+
+Use `$economic-reasoning-engineering` in Codex or `/economic-reasoning-engineering` in Claude Code.
 
 Update an installation with:
 
@@ -55,51 +92,12 @@ Update an installation with:
 git -C "${XDG_DATA_HOME:-$HOME/.local/share}/agent-skills/economic-reasoning-engineering" pull --ff-only
 ```
 
-## Run an investigation
+## Use the result
 
-Create a writable run directory. Keep source material outside the skill installation.
+Open `CONTEXT.md` in the output directory to inspect the analysis or give the complete directory to another agent.
+The agent handles the working directories, validation, package building, and navigation tests during the run.
 
-```text
-my-investigation/
-`-- working/
-    `-- corpus/
-        `-- authorized-source.txt
-```
-
-Ask the agent to use the skill on that corpus. The agent writes extraction artifacts under `working/output/`.
-
-Validate the extraction:
-
-```bash
-python3 /path/to/economic-reasoning-engineering/scripts/validate.py \
-  --project /path/to/my-investigation/working
-```
-
-Build the portable package:
-
-```bash
-python3 /path/to/economic-reasoning-engineering/scripts/context_package.py build \
-  --project /path/to/my-investigation/working \
-  --destination /path/to/my-investigation/output \
-  --title "Investigation title"
-```
-
-The builder refuses to replace a nonempty destination.
-
-## Navigate a portable package
-
-Start with `CONTEXT.md` in the generated output directory. The bundled tool supports deterministic inspection:
-
-```bash
-python3 tools/context_package.py list --package . --collection reasoning_cards
-python3 tools/context_package.py query --package . --id GLOBAL_ID --trace
-python3 tools/context_package.py validate --package .
-python3 tools/context_package.py check-receipt \
-  --package . \
-  --receipt validation/RECEIPT.json
-```
-
-`query --trace` follows a record to its episode and exact source anchors. The query command rejects invalid packages and local-only identifiers.
+Direct Python commands are optional. See the [manual workflow reference](docs/manual-workflow.md) for maintenance and artifact inspection.
 
 ## Repository map
 
@@ -114,10 +112,11 @@ python3 tools/context_package.py check-receipt \
 | [`docs/architecture.md`](docs/architecture.md) | Components and trust boundaries |
 | [`docs/artifact-contract.md`](docs/artifact-contract.md) | Artifact identity and evidence rules |
 | [`docs/verification.md`](docs/verification.md) | Test scope and verification commands |
+| [`docs/manual-workflow.md`](docs/manual-workflow.md) | Optional commands for maintenance and artifact inspection |
 | [`docs/research-status.md`](docs/research-status.md) | Stable and experimental capability boundary |
 | [`AGENTS.md`](AGENTS.md) | Maintenance rules for coding agents |
 
-## Test the repository
+## Development tests
 
 The test suite has no third-party runtime dependency.
 
