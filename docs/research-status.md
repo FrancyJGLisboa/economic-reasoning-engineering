@@ -33,4 +33,12 @@ The [first judgment-transfer pilot](evaluations/judgment-transfer-pilot.md) comp
 Both conditions matched all frozen multiple-choice conclusions and primary criteria.
 The package supplied resolvable method references. It did not improve agreement on this sample.
 The baseline reached the test ceiling. This does not establish identical judgment or make the package unnecessary.
-Human review and a harder open-response evaluation remain pending.
+Human review remains pending. The subsequent open-response audit appears below.
+
+## Open-response personal decision case
+
+The [Sivers open-response audit](evaluations/sivers-open-response.md) found a difference in predicted pricing policy across context conditions.
+Both package responses predicted the additional-fee removal described in the reserved account. Both baseline responses predicted charging after launch.
+Model-assessed explanatory alignment did not improve overall.
+All sessions recognized the public case, so the experiment cannot isolate personal-judgment transfer from prior story knowledge.
+The observation remains exploratory. Human review is pending.
