@@ -53,3 +53,12 @@ Small priority differences remain below the assessor's own order-related variati
 The complete inline package consumes 2.37 times the reported input of raw text. This is not a selective-reading benchmark.
 Question cues, generic inference, and possible author recognition limit the judgment-transfer interpretation.
 Human review remains pending. The next confirmatory case needs documented disagreement between analysts facing the same facts.
+
+## Logistics rule application
+
+The [synthetic logistics probe](evaluations/logistics-rule-probe.md) tests a documented rule against changed delivery stages.
+All context conditions reach the expected conclusions. This does not establish incremental judgment improvement.
+Assisted selection finds relevant records, but input totals reach 1.81 times complete raw text after selector overhead.
+The current retrieval presentation does not meet the input-reduction objective.
+A numeric field has ambiguous duration-versus-slack semantics. Its mechanical scores cannot establish arithmetic gains.
+Selective reading remains experimental. Stable skill behavior is unchanged.
