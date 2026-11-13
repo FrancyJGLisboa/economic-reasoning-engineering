@@ -26,3 +26,11 @@ Resource savings alone do not establish equal output quality.
 The package uses ordinary files, Markdown, JSON, and Python. This design supports inspection by many agents with file access.
 
 The project does not claim compatibility with every LLM. Each target agent needs a separate navigation evaluation.
+
+## Documented judgment transfer
+
+The [first judgment-transfer pilot](evaluations/judgment-transfer-pilot.md) compared three historical judgments and one attribution control.
+Both conditions matched all frozen multiple-choice conclusions and primary criteria.
+The package supplied resolvable method references. It did not improve agreement on this sample.
+The baseline reached the test ceiling. This does not establish identical judgment or make the package unnecessary.
+Human review and a harder open-response evaluation remain pending.
