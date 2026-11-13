@@ -42,3 +42,14 @@ Both package responses predicted the additional-fee removal described in the res
 Model-assessed explanatory alignment did not improve overall.
 All sessions recognized the public case, so the experiment cannot isolate personal-judgment transfer from prior story knowledge.
 The observation remains exploratory. Human review is pending.
+
+## Alê open-response comparison with raw sources
+
+The [Alê reserved-episode study](evaluations/ale-open-response.md) compares three cases under no context, raw source text, and a structured package.
+Each condition runs twice. Two model-assessor passes give raw text and the package identical source-criterion totals.
+The package shows no clear judgment advantage over raw text in this sample.
+Small priority differences remain below the assessor's own order-related variation.
+
+The complete inline package consumes 2.37 times the reported input of raw text. This is not a selective-reading benchmark.
+Question cues, generic inference, and possible author recognition limit the judgment-transfer interpretation.
+Human review remains pending. The next confirmatory case needs documented disagreement between analysts facing the same facts.
