@@ -1,6 +1,6 @@
 # Publication plan
 
-Status: IN_PROGRESS
+Status: COMPLETE
 
 ## Outcome
 

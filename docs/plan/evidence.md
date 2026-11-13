@@ -1,6 +1,6 @@
 # Publication evidence
 
-Local verification ran on 2026-11-13 at 13:01 BRT.
+Local verification ran on 2026-11-13 at 13:01 BRT. Remote verification ran at 13:04 BRT.
 
 ## Required evidence
 
@@ -12,6 +12,7 @@ Local verification ran on 2026-11-13 at 13:01 BRT.
 | Skill metadata passes | Product | Skill Creator `quick_validate.py` | Local Skill Creator | PASS | `Skill is valid!` | Does not evaluate behavior. |
 | Codex and Claude Code links resolve | Product | Validate temporary links in both skill directories | Local filesystem | PASS | Two valid skill results | Does not test product UI discovery. |
 | Documentation is navigable | Experience | Link test, structure review, and STE lint | Local repository | PASS | Contract and linter output | Maintainer inspection only. |
-| Remote commit matches local | Engineering | Compare local and remote commit IDs | GitHub | PENDING | Remote reference | Proves Git object identity only. |
+| Remote commit matches local | Engineering | Compare local and remote commit IDs | GitHub | PASS | `refs/heads/main` | Proves Git object identity only. |
+| Continuous integration passes | Engineering | GitHub Actions CI | Ubuntu, Python 3.9, 3.11, and 3.13 | PASS, 3 jobs | [Run 43458818738](https://github.com/FrancyJGLisboa/economic-reasoning-engineering/actions/runs/43458818738) | Does not evaluate economic quality. |
 
 The source tree has no dependency manifest or third-party Python import. A package dependency audit does not apply to this version.
